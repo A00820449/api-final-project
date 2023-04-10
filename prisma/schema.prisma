@@ -16,4 +16,5 @@ model BusinessUser {
   passwordHash  String
   businessName  String
   logoURL       String?
+  dateJoined    DateTime @default(now())
 }
