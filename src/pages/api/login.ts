@@ -1,6 +1,5 @@
 import { NextApiHandler } from "next";
-import { withIronSessionApiRoute } from "iron-session/next";
-import { sessionOptions } from "@/lib/session";
+import { withSessionApiRoute } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { compare } from "bcrypt";
 
@@ -37,8 +36,9 @@ const handler: NextApiHandler = async (req, res) => {
         }
     }
     catch (e) {
-        
+        console.error(e)
+        res.status(500).send({message: "Server error"})
     }
 }
 
-export default withIronSessionApiRoute(handler, sessionOptions)
+export default withSessionApiRoute(handler)
