@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-import { AppBar } from "@mui/material";
 import NavBar from "./navbar";
 
 interface LayoutProps {

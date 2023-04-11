@@ -1,4 +1,3 @@
-import { getUserData } from '@/pages/api/user'
 import type { IronSessionOptions } from 'iron-session'
 import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next'
 import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next'
@@ -23,36 +22,6 @@ export function withSessionSsr<P extends { [key: string]: unknown } = { [key: st
   return withIronSessionSsr(handler, sessionOptions);
 }
 
-
-
-export const getUserProp = withIronSessionSsr(async ({req})=>{
-
-  if (!req.session.user_id) {
-      return {
-          redirect: {
-              permanent: false,
-              destination: "/login"
-          }
-      }
-  }
-
-  const user = await getUserData(req.session.user_id)
-  
-  if (!user) {
-      return {
-          redirect: {
-              permanent: false,
-              destination: "/login"
-          }
-      }
-  }
-
-  return {
-      props: {
-          user: user
-      }
-  }
-}, sessionOptions)
 
 // This is where we specify the typings of req.session.*
 declare module 'iron-session' {

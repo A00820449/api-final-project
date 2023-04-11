@@ -1,5 +1,6 @@
-import { prisma } from "@/lib/db";
-import { withSessionApiRoute } from "@/lib/session";
+import { getUserData } from "@/lib/db";
+import { sessionOptions } from "@/lib/session";
+import { withIronSessionApiRoute } from "iron-session/next";
 import { NextApiHandler } from "next";
 
 const handler: NextApiHandler = async (req, res) => {
@@ -14,19 +15,6 @@ const handler: NextApiHandler = async (req, res) => {
     }
 }
 
-export async function getUserData(id: string) : Promise<User | null> {
-    return await prisma.businessUser.findUnique({
-        where: {
-            id: id
-        },
-        select: {
-            id: true,
-            businessID: true,
-            businessName: true,
-            isAdmin: true
-        }
-    })
-}
 
 export type User = {
     id: string,
@@ -34,4 +22,5 @@ export type User = {
     businessName: string,
     isAdmin: boolean
 }
-export default withSessionApiRoute(handler)
+
+export default withIronSessionApiRoute(handler, sessionOptions)

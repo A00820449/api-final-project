@@ -1,6 +1,8 @@
 import { withSessionSsr } from "@/lib/session";
 import { Container } from "@mui/material";
-import { User, getUserData } from "./api/user";
+import { User } from "./api/user";
+import { getUserData } from "@/lib/db";
+import Link from "next/link";
 
 export const getServerSideProps = withSessionSsr(async ({req})=>{
 
@@ -16,6 +18,7 @@ export const getServerSideProps = withSessionSsr(async ({req})=>{
     const user = await getUserData(req.session.user_id)
     
     if (!user) {
+        req.session.destroy()
         return {
             redirect: {
                 permanent: false,
@@ -33,8 +36,11 @@ export const getServerSideProps = withSessionSsr(async ({req})=>{
 
 const Dashboard = ({user}: {user: User | null}) => {
     return (
-        <Container>
+        <Container sx={{marginTop: "1rem"}}>
             Hello, {user?.businessName}
+            <div>
+                <Link href={"/api/redirectLogout"}>Logout</Link>
+            </div>
         </Container>
     )
 }

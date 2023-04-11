@@ -1,25 +1,6 @@
 import { NextApiHandler } from "next";
 import { withSessionApiRoute } from "@/lib/session";
-import { prisma } from "@/lib/db";
-import { compare } from "bcrypt";
-
-export async function LoginInputQuery(username: string, password: string) {
-    const user = await prisma.businessUser.findUnique({
-        where: {
-            businessID: username
-        }
-    })
-
-    if (!user) {
-        return null
-    }
-
-    if (await compare(password, user.passwordHash)) {
-        return user.id
-    }
-
-    return null
-}
+import { LoginInputQuery, prisma } from "@/lib/db";
 
 interface LoginInput {
     username?: string,
@@ -37,6 +18,8 @@ const handler: NextApiHandler = async (req, res) => {
         const user_id = await LoginInputQuery(username, password)
 
         if (user_id) {
+            req.session.user_id = user_id
+            await req.session.save()
             return res.json({id: user_id})
         }
 
