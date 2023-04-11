@@ -1,5 +1,6 @@
 import { withSessionSsr } from "@/lib/session";
-import { Alert, Button, Container, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Container, TextField, Typography } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEventHandler, useState } from "react";
 
@@ -70,12 +71,15 @@ const Login = () => {
     return (
         <Container maxWidth="xs">
             {message && <Alert severity="error">{message}</Alert>}
-            <Typography variant="h3">Login</Typography>
+            <Typography variant="h4" sx={{margin: "1rem 0"}}>Login</Typography>
             <form onSubmit={handleSubmit}>
-                <TextField sx={{padding: "0 0 1rem 0"}} fullWidth name="username" placeholder="Business ID"/>
-                <TextField sx={{padding: "0 0 1rem 0"}} fullWidth name="password" placeholder="Password" type="password"/>
-                <Button type="submit" disabled={uploading} fullWidth variant="contained">Log In</Button>
+                <TextField sx={{marginBottom: "1rem"}} fullWidth name="username" placeholder="Business ID"/>
+                <TextField sx={{marginBottom: "1rem"}} fullWidth name="password" placeholder="Password" type="password"/>
+                <Button sx={{marginBottom: "1rem"}} type="submit" disabled={uploading} fullWidth variant="contained">Log In</Button>
             </form>
+            <Box>
+                Don't have an account? <Link href={'/signup'}>Sign up</Link>
+            </Box>
         </Container>
     )
 }

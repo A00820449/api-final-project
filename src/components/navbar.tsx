@@ -1,4 +1,5 @@
 import {AppBar, Toolbar, Box, Typography} from "@mui/material"
+import Link from "next/link"
 
 const NavBar = () => {
     return (
@@ -6,7 +7,7 @@ const NavBar = () => {
         <AppBar position='sticky'>
             <Toolbar>
                 <Typography variant="h6" sx={{textAlign: "center"}} flexGrow={1}>
-                    App
+                    <Link href={'/'} style={{color: "inherit", textDecoration: "inherit"}}>App</Link>
                 </Typography>
             </Toolbar>
         </AppBar>
