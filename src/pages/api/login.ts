@@ -3,6 +3,24 @@ import { withSessionApiRoute } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { compare } from "bcrypt";
 
+export async function LoginInputQuery(username: string, password: string) {
+    const user = await prisma.businessUser.findUnique({
+        where: {
+            businessID: username
+        }
+    })
+
+    if (!user) {
+        return null
+    }
+
+    if (await compare(password, user.passwordHash)) {
+        return user.id
+    }
+
+    return null
+}
+
 interface LoginInput {
     username?: string,
     password?: string
@@ -16,24 +34,13 @@ const handler: NextApiHandler = async (req, res) => {
     }
 
     try {
-        const user = await prisma.businessUser.findUnique({
-            where: {
-                businessID: username
-            }
-        })
+        const user_id = await LoginInputQuery(username, password)
 
-        if (!user) {
-            return res.status(400).json({message: "User not found"})
+        if (user_id) {
+            return res.json({id: user_id})
         }
 
-        if (await compare(password, user.passwordHash)) {
-            req.session.user_id = user.id
-            await req.session.save()
-            return res.json({id: user.id})
-        }
-        else {
-            res.status(400).send({message: "Wrong password"})
-        }
+        return res.status(400).json({message: "Wrong username or password"})
     }
     catch (e) {
         console.error(e)

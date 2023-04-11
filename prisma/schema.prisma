@@ -17,4 +17,5 @@ model BusinessUser {
   businessName  String
   logoURL       String?
   dateJoined    DateTime @default(now())
+  isAdmin       Boolean @default(false)
 }
