@@ -23,28 +23,76 @@ export const getServerSideProps = withSessionSsr(async ({req})=>{
 
 const SignUp = () => {
 
+    const [errmessage, setErrMessage] = useState("")
     const [message, setMessage] = useState("")
     const [uploading, setUploading] = useState(false)
     const router = useRouter()
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
         e.preventDefault()
-        const data = new FormData(e.currentTarget)
+        const formData = new FormData(e.currentTarget)
+
+        const name = formData.get("name")?.toString()?.trim() || ''
+        const username = formData.get("username")?.toString()?.trim() || ''
+        const password = formData.get("password")?.toString() || ''
+        const password2 = formData.get("password2")?.toString() || ''
+
+        if (name.match(/^[A-Za-z0-9_.-]{3,16}$/g)) {
+            setErrMessage("Business ID has to be 3-16 characters long and can only contain numbers, letters, underscores, dashes, or periods.")
+            return
+        }
+
+        if (password !== password2) {
+            setErrMessage("Passwords do not match")
+            return
+        }
+
+        setUploading(true)
+        try {
+            const res = await fetch("/api/signup", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({businessID: username, name, password})
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                throw new Error(data?.message || "Server error")
+            }
+            setErrMessage("")
+
+            setMessage("Sign up successful! Redirecting to Login page...")
+            e.currentTarget.reset()
+            setTimeout(() => router.push("/login"), 5000)
+
+        } catch (e) {
+            if (e instanceof Error) {
+                setErrMessage(e.message || "Server error")
+            }
+            else {
+                setErrMessage("Server error")
+            }
+        }
+        setUploading(false)
     }
 
     return (
         <Container maxWidth="xs">
-            {message && <Alert severity="error">{message}</Alert>}
+            {errmessage && <Alert severity="error">{errmessage}</Alert>}
+            {message && <Alert severity="success">{message}</Alert>}
             <Typography variant="h4" sx={{margin: "1rem 0"}}>Create an account</Typography>
             <form onSubmit={handleSubmit}>
-                <TextField sx={{marginBottom: "1rem"}} fullWidth name="username" placeholder="Business ID (will be used in your URL)"/>
-                <TextField sx={{marginBottom: "1rem"}} fullWidth name="name" placeholder="Business Name"/>
-                <TextField sx={{marginBottom: "1rem"}} fullWidth name="password" placeholder="Password" type="password"/>
-                <TextField sx={{marginBottom: "1rem"}} fullWidth name="password2" placeholder="Confirm Password" type="password"/>
+                <TextField required sx={{marginBottom: "1rem"}} fullWidth name="username" placeholder="Business ID (will be used in your URL)"/>
+                <TextField required sx={{marginBottom: "1rem"}} fullWidth name="name" placeholder="Business Name"/>
+                <TextField required sx={{marginBottom: "1rem"}} fullWidth name="password" placeholder="Password" type="password"/>
+                <TextField required sx={{marginBottom: "1rem"}} fullWidth name="password2" placeholder="Confirm Password" type="password"/>
                 <Button sx={{marginBottom: "1rem"}} type="submit" disabled={uploading} fullWidth variant="contained">Register Account</Button>
             </form>
             <Box>
-                Already have ana account? <Link href={'/login'}>Log In</Link>
+                Already have and account? <Link href={'/login'}>Log In</Link>
             </Box>
         </Container>
     )

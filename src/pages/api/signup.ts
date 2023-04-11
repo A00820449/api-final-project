@@ -17,6 +17,10 @@ const handler: NextApiHandler = async (req, res) => {
             return res.status(400).json({message: "Invalid request"})
         }
 
+        if (!businessID.match(/^[A-Za-z0-9_.-]{3,16}$/g)) {
+            return res.status(400).json({message: "Invalid business ID"})
+        }
+
         const passwrodHash = await hash(password, 10)
 
         const user = await prisma.businessUser.create({
