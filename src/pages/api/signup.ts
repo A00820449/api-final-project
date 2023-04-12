@@ -1,7 +1,7 @@
 import { NextApiHandler } from "next";
 import { hash } from "bcrypt";
 import { prisma } from "@/lib/db";
-
+import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from "@prisma/client/runtime";
 
 interface SignUpInput {
     businessID?: string,
@@ -36,7 +36,16 @@ const handler: NextApiHandler = async (req, res) => {
     }
     catch(e) {
         console.error(e)
-        res.status(500).json({message: "An error occurred"})
+        if (typeof e === "object" && e !== null && "code" in e && e.code === 'P2002') {
+            res.status(400).json({message: "Business ID already exists"})
+        }
+        /** Send error message if there is one (might not be secure) */
+        /*else if (e instanceof Error) {
+            res.status(500).json({message: e.message || "An error occurred"})
+        }*/
+        else {
+            res.status(500).json({message: "An error occurred"})
+        }
     }
 }
 
